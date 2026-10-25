@@ -1,0 +1,11 @@
+services:
+  - type: web
+    runtime: static
+    name: rates-tracker
+    buildCommand: python3 scripts/build.py
+    staticPublishPath: ./public
+    pullRequestPreviewsEnabled: false
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=3600
