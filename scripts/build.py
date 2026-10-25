@@ -31,13 +31,13 @@ for t in D["topics"]:
     chh = "".join(f'<li><time>{fmt(c["date"])}</time> {e(c["text"])}</li>' for c in ch)
     s = t["source"]; also = f' · <a href="{e(s["also"])}" rel="noopener">מקור נוסף</a>' if s.get("also") else ""
     body = f'''<h1>{e(t["title"])}</h1><p class="lead">{e(t["summary"])}</p>
-<p class="meta">בתוקף מ-{fmt(t["effective"])} · נבדק לאחרונה: {fmt(t["checked"])}</p>
+<p class="meta">בתוקף מ-{fmt(t["effective"])} · נבדק לאחרונה: {fmt(t["checked"])}{(" · בדיקה הבאה: "+fmt(t["next_review"])) if t.get("next_review") else ""}</p>
 {table(t["table"])}{"<ul class='facts'>"+facts+"</ul>" if facts else ""}
 {"<h2>שינויים אחרונים</h2><ul>"+chh+"</ul>" if chh else ""}
 <h2>הערות</h2><ul>{notes}</ul>
 <p class="src">מקור: <a href="{e(s["url"])}" rel="noopener">{e(s["name"])}</a>{also}</p>'''
     page(t["title"], t["summary"], body, f"/{t['slug']}/")
-order=["מס","שכר וביטוח לאומי","קצבאות וגמלאות","חיסכון פנסיוני"]
+order=["נתונים חודשיים","מס","שכר וביטוח לאומי","קצבאות וגמלאות","חיסכון פנסיוני"]
 cards = ""
 for g in order:
     items = "".join(f'<li><a href="/{t["slug"]}/"><b>{e(t["short"])}</b><span>{e(t["summary"])}</span></a></li>' for t in D["topics"] if t["group"]==g)

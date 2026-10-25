@@ -18,8 +18,13 @@ def text(b, u):
     return b.decode("utf-8","ignore")
 def norm(s): return re.sub(r"[,\s]", "", s)
 bad = []
+today = datetime.date.today().isoformat()
 for t in D["topics"]:
     u = t["source"]["url"]
+    nr = t.get("next_review")
+    if nr and today >= nr:  # live topic: a new release is due or out; agent must refresh value, dates, changes entry
+        bad.append((t["slug"], f"DUE: new release expected since {nr} - refresh from {u}"))
+    if t.get("check_mode") == "due": continue  # source page not fetchable by script (JS/403): due-date only
     try: body = norm(text(fetch(u), u))
     except Exception as ex: bad.append((t["slug"], f"FETCH FAILED: {ex}")); continue
     for c in t["check"]:
