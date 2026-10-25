@@ -5,16 +5,19 @@ root = pathlib.Path(__file__).resolve().parent.parent
 D = json.loads((root/"data/data.json").read_text(encoding="utf-8"))
 pub = root/"public"; pub.mkdir(exist_ok=True)
 S = D["site"]; e = html.escape
-SITE_URL = "https://example.co.il"  # TODO: set after domain chosen
+import os
+SITE_URL = os.environ.get("SITE_URL","https://example.com")  # set real domain before launch
+NOINDEX = os.environ.get("INDEX")!="1"  # staging (Render temp URL) = noindex; build with INDEX=1 for production
 ADS = ""  # TODO: AdSense script goes here after approval (ca-pub id)
 def fmt(d):
     y,m,dd = d.split("-"); return f"{int(dd)}.{int(m)}.{y}"
-def page(title, desc, body, path):
+def page(title, desc, body, path, mod=None):
+    ld = ('<script type="application/ld+json">'+json.dumps({"@context":"https://schema.org","@type":"Article","headline":title,"inLanguage":"he","dateModified":mod,"description":desc},ensure_ascii=False)+'</script>') if mod else ''
     nav = '<a href="/">ראשי</a><a href="/mah-hishtana/">מה השתנה</a><a href="/about/">אודות</a>'
     out = f'''<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)} | {e(S["name"])}</title><meta name="description" content="{e(desc)}">
-<link rel="canonical" href="{SITE_URL}{path}"><link rel="stylesheet" href="/css/style.css">{ADS}</head><body>
+<link rel="canonical" href="{SITE_URL}{path}">{"<meta name=robots content=noindex,nofollow>" if NOINDEX else ""}<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:locale" content="he_IL"><meta property="og:type" content="article"><meta property="og:url" content="{SITE_URL}{path}">{ld}<link rel="stylesheet" href="/css/style.css">{ADS}</head><body>
 <header><a class="brand" href="/">{e(S["name"])}</a><nav>{nav}</nav></header><main>{body}</main>
 <footer><p>המידע באתר הוא הערכה למטרות מידע בלבד ואינו ייעוץ מס, משפטי או פיננסי. במקרה של סתירה גוברות הוראות הדין והמקור הרשמי.</p>
 <p><a href="/about/">אודות</a> · <a href="/privacy/">פרטיות</a> · <a href="/disclaimer/">הבהרה משפטית</a></p></footer></body></html>'''
@@ -30,13 +33,15 @@ for t in D["topics"]:
     ch = [c for c in D["changes"] if c["topic"]==t["slug"]]
     chh = "".join(f'<li><time>{fmt(c["date"])}</time> {e(c["text"])}</li>' for c in ch)
     s = t["source"]; also = f' · <a href="{e(s["also"])}" rel="noopener">מקור נוסף</a>' if s.get("also") else ""
-    body = f'''<h1>{e(t["title"])}</h1><p class="lead">{e(t["summary"])}</p>
+    rel = "".join(f'<li><a href="/{x["slug"]}/">{e(x["short"])}</a></li>' for x in D["topics"] if x["group"]==t["group"] and x["slug"]!=t["slug"])
+    body = f'''<h1>{e(t.get("h1",t["title"]))}</h1><p class="lead">{e(t.get("intro",t["summary"]))}</p>
 <p class="meta">בתוקף מ-{fmt(t["effective"])} · נבדק לאחרונה: {fmt(t["checked"])}{(" · בדיקה הבאה: "+fmt(t["next_review"])) if t.get("next_review") else ""}</p>
 {table(t["table"])}{"<ul class='facts'>"+facts+"</ul>" if facts else ""}
 {"<h2>שינויים אחרונים</h2><ul>"+chh+"</ul>" if chh else ""}
 <h2>הערות</h2><ul>{notes}</ul>
+{"<h2>עוד בנושא</h2><ul>"+rel+"</ul>" if rel else ""}
 <p class="src">מקור: <a href="{e(s["url"])}" rel="noopener">{e(s["name"])}</a>{also}</p>'''
-    page(t["title"], t["summary"], body, f"/{t['slug']}/")
+    page(t["title"], t.get("intro",t["summary"]), body, f"/{t['slug']}/", t["checked"])
 order=["נתונים חודשיים","מס","שכר וביטוח לאומי","קצבאות וגמלאות","חיסכון פנסיוני"]
 cards = ""
 for g in order:
@@ -58,5 +63,5 @@ page("הבהרה משפטית", "הבהרה משפטית", '''<h1>הבהרה מ�
 <p>קישורי שותפים, אם יופיעו, ימוסמנו ועשויים להניב לאתר עמלה.</p>''', "/disclaimer/")
 urls = ["/","/mah-hishtana/","/about/","/privacy/","/disclaimer/"]+[f"/{t['slug']}/" for t in D["topics"]]
 (pub/"sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+"".join(f"<url><loc>{SITE_URL}{u}</loc></url>" for u in urls)+"</urlset>")
-(pub/"robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
+(pub/"robots.txt").write_text(("User-agent: *\nDisallow: /\n" if NOINDEX else f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n"))
 print("built", len(urls), "pages")
