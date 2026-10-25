@@ -37,9 +37,13 @@ for t in D["topics"]:
 <h2>הערות</h2><ul>{notes}</ul>
 <p class="src">מקור: <a href="{e(s["url"])}" rel="noopener">{e(s["name"])}</a>{also}</p>'''
     page(t["title"], t["summary"], body, f"/{t['slug']}/")
-cards = "".join(f'<li><a href="/{t["slug"]}/"><b>{e(t["short"])}</b><span>{e(t["summary"])}</span></a></li>' for t in D["topics"])
+order=["מס","שכר וביטוח לאומי","קצבאות וגמלאות","חיסכון פנסיוני"]
+cards = ""
+for g in order:
+    items = "".join(f'<li><a href="/{t["slug"]}/"><b>{e(t["short"])}</b><span>{e(t["summary"])}</span></a></li>' for t in D["topics"] if t["group"]==g)
+    cards += f'<h3>{e(g)}</h3><ul class="cards">{items}</ul>'
 recent = "".join(f'<li><time>{fmt(c["date"])}</time> <a href="/{c["topic"]}/">{e(topics[c["topic"]]["short"])}</a>: {e(c["text"])}</li>' for c in sorted(D["changes"], key=lambda c:c["date"], reverse=True)[:5])
-page(S["name"], S["tagline"], f'<h1>{e(S["tagline"])}</h1><p class="lead">כל נתון מצוטט למקור רשמי עם תאריך בדיקה. נבדק לאחרונה: {fmt(S["verified"])}.</p><h2>מה השתנה לאחרונה</h2><ul>{recent}</ul><p><a href="/mah-hishtana/">כל השינויים</a></p><h2>נושאים</h2><ul class="cards">{cards}</ul>', "/")
+page(S["name"], S["tagline"], f'<h1>{e(S["tagline"])}</h1><p class="lead">כל נתון מצוטט למקור רשמי עם תאריך בדיקה. נבדק לאחרונה: {fmt(S["verified"])}.</p><h2>מה השתנה לאחרונה</h2><ul>{recent}</ul><p><a href="/mah-hishtana/">כל השינויים</a></p><h2>נושאים</h2>{cards}', "/")
 allc = "".join(f'<li><time>{fmt(c["date"])}</time> <a href="/{c["topic"]}/">{e(topics[c["topic"]]["short"])}</a>: {e(c["text"])}</li>' for c in sorted(D["changes"], key=lambda c:c["date"], reverse=True))
 page("מה השתנה", "יומן שינויים בשיעורי מס, שכר וקצבאות בישראל", f'<h1>מה השתנה</h1><p class="lead">יומן השינויים שזיהינו במקורות הרשמיים, מהחדש לישן.</p><ul>{allc}</ul>', "/mah-hishtana/")
 page("אודות", "על האתר ושיטת העבודה", '''<h1>אודות</h1><p>האתר עוקב אחרי נתונים כספיים רשמיים בישראל: מדרגות מס, שכר מינימום, ביטוח לאומי, קצבאות ומע"מ. כל נתון מצוטט למקור ממשלתי עם תאריך בדיקה.</p>
