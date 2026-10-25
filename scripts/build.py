@@ -7,7 +7,7 @@ pub = root/"public"; pub.mkdir(exist_ok=True)
 S = D["site"]; e = html.escape
 SITE_URL = os.environ.get("SITE_URL","https://example.com")
 NOINDEX = os.environ.get("INDEX")!="1"   # staging = noindex. Production: INDEX=1 SITE_URL=https://domain
-ADS = ""  # AdSense snippet after approval
+ADS = '<meta name="google-adsense-account" content="ca-pub-9011390098995936">'  # site ownership verification; ad script itself added only after privacy/consent review
 def fmt(d):
     y,m,dd = d.split("-"); return f"{int(dd)}.{int(m)}.{y}"
 ICON = {"pct":'<line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
@@ -144,5 +144,6 @@ sx=[{"u":f"/{t['slug']}/","t":t.get("h1",t["title"]),"d":t["answer"]["value"]+" 
 (pub/"search.json").write_text(json.dumps(sx,ensure_ascii=False))
 urls=["/","/machshevonim/","/mah-hishtana/","/about/","/privacy/","/disclaimer/"]+[f"/{t['slug']}/" for t in D["topics"]]+[f"/{c['slug']}/" for c in CALCS]
 (pub/"sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+"".join(f"<url><loc>{SITE_URL}{u}</loc></url>" for u in urls)+"</urlset>")
+(pub/"ads.txt").write_text("google.com, pub-9011390098995936, DIRECT, f08c47fec0942fa0\n")
 (pub/"robots.txt").write_text("User-agent: *\nDisallow: /\n" if NOINDEX else f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
 print("built",len(urls),"pages")
