@@ -19,11 +19,31 @@ def text(b, u):
 def norm(s): return re.sub(r"[,\s]", "", s)
 bad = []
 today = datetime.date.today().isoformat()
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+def adapter_check(t):
+    """Topics with an adapter: compare stored expect values against the live official API."""
+    import update as U
+    at = t["adapter"]; exp = at.get("expect", {})
+    if at["type"] == "cbs_cpi":
+        st = U.fetch_cpi()
+        got = {"period": f"{st['year']}-{st['month']:02d}", "level": f"{st['value']:g}", "mom": f"{st['mom']:g}", "yoy": f"{st['yoy']:g}"}
+    elif at["type"] == "boi_interest":
+        st = U.fetch_boi()
+        got = {"rate": f"{st['rate']:g}", "next": st["next"], "published": st["published"]}
+    else:
+        return ["unknown adapter type " + str(at.get("type"))]
+    return [f"adapter {k}: published '{exp.get(k)}' != live '{v}'" for k, v in got.items() if str(exp.get(k)) != str(v)]
+
 for t in D["topics"]:
     u = t["source"]["url"]
     nr = t.get("next_review")
     if nr and today >= nr:  # live topic: a new release is due or out; agent must refresh value, dates, changes entry
         bad.append((t["slug"], f"DUE: new release expected since {nr} - refresh from {u}"))
+    if t.get("adapter"):
+        try:
+            for m in adapter_check(t): bad.append((t["slug"], m))
+        except Exception as ex: bad.append((t["slug"], f"ADAPTER FETCH FAILED: {ex}")); continue
+    if t.get("adapter"): continue  # adapter topics are verified against the API, not string-matched
     if t.get("check_mode") == "due": continue  # source page not fetchable by script (JS/403): due-date only
     try: body = norm(text(fetch(u), u))
     except Exception as ex: bad.append((t["slug"], f"FETCH FAILED: {ex}")); continue

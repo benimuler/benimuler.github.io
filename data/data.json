@@ -65,6 +65,14 @@
     "label": "ריבית בנק ישראל",
     "value": "3.25%",
     "sub": "ללא שינוי בהחלטה מ-21.10.2026 · ההחלטה הבאה 23.11.2026"
+   },
+   "adapter": {
+    "type": "boi_interest",
+    "expect": {
+     "rate": "3.25",
+     "next": "2026-11-23",
+     "published": "2026-10-21"
+    }
    }
   },
   {
@@ -77,7 +85,7 @@
     "url": "https://www.cbs.gov.il/he/mediarelease/Madad/DocLib/2026/326/10_26_326b.pdf",
     "also": "https://www.cbs.gov.il/he/mediarelease/Madad/DocLib/2026/293/10_26_293b.pdf"
    },
-   "checked": "2026-10-16",
+   "checked": "2026-10-25",
    "effective": "2026-10-15",
    "next_review": "2026-11-15",
    "group": "נתונים חודשיים",
@@ -136,6 +144,15 @@
     "label": "מדד ספטמבר 2026",
     "value": "105.3",
     "sub": "ירידה של 0.5% בחודש · 1.6% ב-12 חודשים"
+   },
+   "adapter": {
+    "type": "cbs_cpi",
+    "expect": {
+     "period": "2026-09",
+     "level": "105.3",
+     "mom": "-0.5",
+     "yoy": "1.6"
+    }
    }
   },
   {
