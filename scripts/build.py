@@ -82,7 +82,7 @@ def head(title,desc,path,mod=None,extra=""):
     ld=('<script type="application/ld+json">'+json.dumps({"@context":"https://schema.org","@type":"Article","headline":title,"inLanguage":"he","dateModified":mod,"description":desc},ensure_ascii=False)+'</script>') if mod else ''
     rb='<meta name="robots" content="noindex,nofollow">' if NOINDEX else ''
     return f'''<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#4338ca">
-<title>{e(title)} | {e(S["name"])}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{SITE_URL}{path}">{rb}
+<title>{e(title if title.startswith(S["name"]) else title+" | "+S["name"])}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{SITE_URL}{path}">{rb}
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:locale" content="he_IL"><meta property="og:type" content="article"><meta property="og:url" content="{SITE_URL}{path}">
 <link rel="preload" href="/fonts/heebo-400.ttf" as="font" type="font/ttf" crossorigin><link rel="stylesheet" href="/css/style.css"><script>try{{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme:dark)").matches)document.documentElement.dataset.theme="dark"}}catch(e){{}}</script>{ld}{ADS}</head>'''
 def shell(title,desc,body,path,mod=None,hero=None,cur=""):
