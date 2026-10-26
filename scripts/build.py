@@ -144,6 +144,7 @@ sx=[{"u":f"/{t['slug']}/","t":t.get("h1",t["title"]),"d":t["answer"]["value"]+" 
 (pub/"search.json").write_text(json.dumps(sx,ensure_ascii=False))
 urls=["/","/machshevonim/","/mah-hishtana/","/about/","/privacy/","/disclaimer/"]+[f"/{t['slug']}/" for t in D["topics"]]+[f"/{c['slug']}/" for c in CALCS]
 (pub/"sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+"".join(f"<url><loc>{SITE_URL}{u}</loc></url>" for u in urls)+"</urlset>")
+(pub/"google63cf0cbdb598d861.html").write_text("google-site-verification: google63cf0cbdb598d861.html\n")
 (pub/"ads.txt").write_text("google.com, pub-9011390098995936, DIRECT, f08c47fec0942fa0\n")
 (pub/"robots.txt").write_text("User-agent: *\nDisallow: /\n" if NOINDEX else f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
 print("built",len(urls),"pages")
