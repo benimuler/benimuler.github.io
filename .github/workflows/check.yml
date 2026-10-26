@@ -7,5 +7,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get install -y poppler-utils
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils
       - run: python3 scripts/check.py   # fails (and emails repo owner) when a published value no longer matches its official source
