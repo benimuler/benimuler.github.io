@@ -30,6 +30,8 @@ def adapter_check(t):
     elif at["type"] == "boi_interest":
         st = U.fetch_boi()
         got = {"rate": f"{st['rate']:g}", "next": st["next"], "published": st["published"]}
+        if got["rate"] == str(exp.get("rate")) and got["next"] == str(exp.get("next")):
+            got.pop("published")  # published-only drift = non-monetary press release, not a decision
     else:
         return ["unknown adapter type " + str(at.get("type"))]
     return [f"adapter {k}: published '{exp.get(k)}' != live '{v}'" for k, v in got.items() if str(exp.get(k)) != str(v)]

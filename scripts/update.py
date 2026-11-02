@@ -95,7 +95,7 @@ def upd_boi(t, st, changes):
     exp = a.get("expect", {})
     cur = f"{st['rate']:g}"
     changed = exp.get("rate") != cur
-    decided = exp.get("published") != st["published"]
+    decided = exp.get("published") != st["published"] and (changed or exp.get("next") != st["next"])
     if not changed and not decided:
         if exp.get("next") != st["next"]:
             pass  # next-date revision alone: update quietly below
